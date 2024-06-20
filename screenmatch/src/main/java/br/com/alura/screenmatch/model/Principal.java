@@ -2,6 +2,9 @@ package br.com.alura.screenmatch.model;
 
 import br.com.alura.screenmatch.services.ConsumoAPI;
 
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -55,7 +58,7 @@ public class Principal {
 ////                .forEach(System.out::println);
 
 
-        //Filtrar
+        //Cria novo objeto apartir de Episodio.class, resgatando dados de listaEpisodios.
         List<Episodio> episodios = listaTemporadas
                 .stream()
                 .flatMap(t -> t.listaEpisodios().stream()
@@ -63,5 +66,23 @@ public class Principal {
                 .toList();
 
         episodios.forEach(System.out::println);
+
+        //Entrada interface com usuário
+        System.out.println("A partir de qual ano deseja ver os episódios?");
+        var ano = scanner.nextInt();
+        scanner.nextLine();
+
+        //Criando uma variável do tipo LocalDate e definindo um formato de data;
+        LocalDate localDate = LocalDate.of(ano, 1, 1);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        //Filtragem de dados pela variável localDate
+        episodios.stream()
+                .filter(f -> f.getDataLancamento() != null && f.getDataLancamento().isAfter(localDate))
+                .forEach(f -> System.out.println(
+                        "Temporada: " + f.getTemporada() +
+                                " Episodio " + f.getNumeroEpisodio() +
+                                " Data de Lançamento: " + f.getDataLancamento().format(formatter)
+                ));
     }
 }
