@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalDouble;
 
 @Entity
 @Table(name = "series")
@@ -27,17 +28,17 @@ public class Serie {
     private String sinopse;
     private String poster;
 
-    @Transient
-    private List<Episodio> episodiosList = new ArrayList<>();
+    @OneToMany(mappedBy = "serie", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Episodio> episodios = new ArrayList<>();
 
     public Serie (DadosSeries dadosSeries){
         this.titulo = dadosSeries.titulo();
         this.temporadas = dadosSeries.temporadas();
-        this.avaliacao = dadosSeries.avaliacao();
+        this.avaliacao = OptionalDouble.of(dadosSeries.avaliacao()).orElse(0);
         this.genero = Categoria.fromString(dadosSeries.genero().split(",")[0].trim());
         this.atores = dadosSeries.atores();
-        this.sinopse = ConsultaMyMemory.obterTraducao(dadosSeries.sinopse().trim());
         this.poster = dadosSeries.poster();
+        this.sinopse = ConsultaMyMemory.obterTraducao(dadosSeries.sinopse().trim());
     }
 
     public Serie() {
@@ -107,6 +108,15 @@ public class Serie {
         this.poster = poster;
     }
 
+    public List<Episodio> getEpisodios() {
+        return episodios;
+    }
+
+    public void setEpisodios(List<Episodio> episodios) {
+        episodios.forEach(e -> e.setSerie(this));
+        this.episodios = episodios;
+    }
+
     @Override
     public String toString() {
         return "\nTitulo: " + titulo +
@@ -115,7 +125,8 @@ public class Serie {
                 "\nGênero: " + genero +
                 "\nAtores: " + atores +
                 "\nSinopse: " + sinopse +
-                "\nPoster: " + poster;
+                "\nPoster: " + poster +
+                "\nEpisódios: " + episodios;
     }
 
 }
