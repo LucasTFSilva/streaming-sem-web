@@ -38,7 +38,7 @@ public class Principal {
                     5) Buscar séries por ator
                     6) Top 5 séries do momento
                     7) Buscar séries por categoria
-                    8) Assistir séries por número de temporadas
+                    8) Buscar séries por temporadas e avaliacao
                     0) Sair
                     *********************************                                 
                     """;
@@ -196,7 +196,10 @@ public class Principal {
         System.out.println("Você deseja assistir séries de até no máximo quantas temporadas?");
         var maxTemporadas = scanner.nextInt();
 
-        List<Serie> seriesMaxTemporadas = repositorio.findByTemporadasIsLessThanEqual(maxTemporadas);
+        System.out.println("Com avaliações a partir de qual valor?");
+        var maxAvaliacao = scanner.nextDouble();
+
+        List<Serie> seriesMaxTemporadas = repositorio.seriesPorTemporadaEAvaliacao(maxTemporadas, maxAvaliacao);
         seriesMaxTemporadas.forEach(System.out::println);
     }
 
