@@ -3,9 +3,12 @@ package br.com.alura.screenmatch.repository;
 import br.com.alura.screenmatch.model.Categoria;
 import br.com.alura.screenmatch.model.Episodio;
 import br.com.alura.screenmatch.model.Serie;
+import jakarta.persistence.metamodel.SingularAttribute;
+import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +23,8 @@ public interface SerieRepository extends JpaRepository<Serie, Long> {
 
     List<Serie> findByGenero(Categoria categoria);
 
+    List<Serie> findTop5ByOrderByEpisodiosDataLancamento();
+
     @Query(value = "select s from Serie s WHERE s.temporadas <= :numeroTemporadas AND s.avaliacao >= :avaliacao")
     List<Serie> seriesPorTemporadaEAvaliacao(Integer numeroTemporadas, Double avaliacao);
 
@@ -28,4 +33,5 @@ public interface SerieRepository extends JpaRepository<Serie, Long> {
 
     @Query("SELECT e FROM Serie s JOIN s.episodios e WHERE s = :serie ORDER BY e.avaliacao DESC LIMIT 5")
     List<Episodio> topEpisodiosPorSerie(Serie serie);
+
 }
