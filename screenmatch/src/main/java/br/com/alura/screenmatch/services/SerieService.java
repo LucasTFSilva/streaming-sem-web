@@ -1,17 +1,16 @@
 package br.com.alura.screenmatch.services;
 
+import br.com.alura.screenmatch.dto.EpisodioDTO;
 import br.com.alura.screenmatch.dto.SerieDTO;
+import br.com.alura.screenmatch.model.Categoria;
 import br.com.alura.screenmatch.model.Serie;
 import br.com.alura.screenmatch.repository.SerieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @Service
 public class SerieService {
@@ -35,18 +34,43 @@ public class SerieService {
     }
 
     public List<SerieDTO> obterLancamentos() {
-        return converteDados(repositorio.findTop5ByOrderByEpisodiosDataLancamento());
+        return converteDados(repositorio.lancamentosMaisRecentes());
     }
 
     public SerieDTO obterPorID(Long id) {
         Optional<Serie> serie = repositorio.findById(id);
-        if (serie.isPresent()){
+        if (serie.isPresent()) {
             Serie s = serie.get();
             return new SerieDTO(s.getId(), s.getTitulo(), s.getTemporadas(), s.getAvaliacao(), s.getGenero(),
                     s.getAtores(), s.getSinopse(), s.getPoster());
         } else {
             return null;
         }
+    }
+
+    public List<EpisodioDTO> obterTodasTemporadas(Long id) {
+        Optional<Serie> serie = repositorio.findById(id);
+        if (serie.isPresent()) {
+            Serie s = serie.get();
+            return s.getEpisodios()
+                    .stream()
+                    .map(e -> new EpisodioDTO(e.getId(), e.getTitulo(), e.getTemporada(), e.getNumeroEpisodio()))
+                    .collect(Collectors.toList());
+        } else {
+            return null;
+        }
+    }
+
+    public List<EpisodioDTO> obterTemporadasPorNumero(Long id, Long numero) {
+        return repositorio.obterEpisodiosPorTemporada(id, numero)
+                .stream()
+                .map(e -> new EpisodioDTO(e.getId(), e.getTitulo(), e.getTemporada(), e.getNumeroEpisodio()))
+                .collect(Collectors.toList());
+    }
+
+    public List<SerieDTO> obterSeriesPorCategoria(String categoria) {
+        Categoria genero = Categoria.fromPortugues(categoria);
+        return converteDados(repositorio.findByGenero(genero));
     }
 }
 
